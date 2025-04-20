@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+option java_package = "com.chatapp.grpc";
+option java_multiple_files = true;
+
+// Message sent by clients
+message ChatMessage {
+  string message_id = 1;
+  string user_id = 2;
+  string topic = 3;
+  string content = 4;
+  map<string, int32> vector_clock = 5;
+  int64 timestamp = 6;
+}
+
+// Request to join a chat topic
+message JoinRequest {
+  string user_id = 1;
+  string topic = 2;
+}
+
+// Confirmation after sending a message
+message SendConfirmation {
+  bool success = 1;
+  string message_id = 2;
+}
+
+// Request to get chat history
+message LogRequest {
+  string topic = 1;
+  string user_id = 2; // Optional for filtering by user
+  int32 limit = 3;    // Optional for limiting results
+}
+
+// Request to get user list for a topic
+message UserListRequest {
+  string topic = 1;
+}
+
+// Response containing user list
+message UserListResponse {
+  repeated string users = 1;
+}
+
+// Chat service definition
+service ChatService {
+  // Join a chat topic and receive stream of messages
+  rpc JoinChat(JoinRequest) returns (stream ChatMessage);
+
+  // Send a message to a chat topic
+  rpc SendMessage(ChatMessage) returns (SendConfirmation);
+
+  // Get log of messages for a topic
+  rpc GetLog(LogRequest) returns (stream ChatMessage);
+
+  // Get list of users in a topic
+  rpc GetUsers(UserListRequest) returns (UserListResponse);
+}
