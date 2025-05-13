@@ -1,2 +1,2 @@
 # PSD-SDGE
-## Serviço distribuído de conversação
+## Serviço distribuído de chat
