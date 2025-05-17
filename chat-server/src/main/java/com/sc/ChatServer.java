@@ -7,6 +7,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
 
+import org.json.JSONObject;
+
 public class ChatServer {
     private int READ_MAX_CHARS = 300;
 
@@ -25,7 +27,8 @@ public class ChatServer {
             ByteBuffer readBuffer = ByteBuffer.allocate(READ_MAX_CHARS);
             Connection.read(readBuffer);
             String message = readBuffer.toString();
-            return new Message(message);
+            JSONObject json = new JSONObject(message);
+            return new Message(json);
         } catch (IOException e) {
             System.out.println("[IOException] " + e.toString());
             return null;

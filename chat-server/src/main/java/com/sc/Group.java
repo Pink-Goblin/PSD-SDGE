@@ -4,17 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Group {
-    private String GroupName;
-    private List<String> Members;
+    public String GroupName;
+    private List<Client> Members;
     private List<Message> ChatLog;
     private List<ChatServer> Servers;
 
-    public Group(String name, String firstMember) {
+    public Group(String name) {
         this.GroupName = name;
-        this.Members = new ArrayList<String>();
-        Members.add(firstMember);
+        this.Members = new ArrayList<Client>();
         this.ChatLog = new ArrayList<Message>();
         this.Servers = new ArrayList<ChatServer>();
+    }
+
+    public void addMember(Client client) {
+        Members.add(client);
+    }
+
+    public void removeMember(Client client) {
+        Members.remove(client);
     }
 
     public void receiveMessages() {
@@ -24,17 +31,15 @@ public class Group {
         }
     }
 
-    public void addMessage(String text, String sender) {
-        if (text == "")
-            return;
-        if (sender == "")
-            return;
-
-        Message m = new Message(text, sender);
-        ChatLog.add(m);
+    public void addMessage(Message message, Client sender) {
+        ChatLog.add(message);
 
         for (ChatServer server : Servers) {
-            server.postMessage(m);
+            server.postMessage(message);
+        }
+
+        for (Client client : Members) {
+            client.sendMessage(message.toString());
         }
     }
 }
