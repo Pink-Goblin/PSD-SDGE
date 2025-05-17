@@ -1,33 +1,34 @@
 package com.sc;
 
-import java.time.LocalTime;
+import org.json.JSONObject;
 
 public class Message {
+    public String Group;
     public String Text;
     public String Sender;
-    public int Timestamp;
+    public long Timestamp;
 
-    public Message(String text, String sender) {
+    public Message(String group, String text, String sender) {
+        this.Group = group;
         this.Text = text;
         this.Sender = sender;
-        this.Timestamp = LocalTime.now().toSecondOfDay();
+        this.Timestamp = System.currentTimeMillis();
     }
 
-    public Message(String message) {
-        String[] pipe_split = message.split(" | ");
-
-        this.Timestamp = Integer.parseInt(pipe_split[0]);
-        this.Sender = pipe_split[1];
-        this.Text = pipe_split[2];
+    public Message(JSONObject json) {
+        this.Group = json.getString("group");
+        this.Text = json.getString("text");
+        this.Sender = json.getString("sender");
+        this.Timestamp = json.getInt("timestamp");
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        return sb.append(Timestamp)
-                .append(" | ")
-                .append(Sender)
-                .append(" | ")
-                .append(Text)
-                .toString();
+        JSONObject json = new JSONObject();
+        json.put("method", "message");
+        json.put("timestamp", Timestamp);
+        json.put("group", Group);
+        json.put("sender", Sender);
+        json.put("text", Text);
+        return json.toString();
     }
 }

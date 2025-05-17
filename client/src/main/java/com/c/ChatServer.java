@@ -7,6 +7,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
 
+import org.json.JSONObject;
+
 public class ChatServer {
     private int READ_MAX_CHARS = 300;
 
@@ -20,12 +22,34 @@ public class ChatServer {
         Connection.configureBlocking(false);
     }
 
+    public void connectToGroup(String groupName) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("method", "connect_to_group");
+            json.put("group", groupName);
+            byte[] bytes = json.toString().getBytes();
+            ByteBuffer writeBuffer = ByteBuffer.wrap(bytes);
+            Connection.write(writeBuffer);
+        } catch (IOException e) {
+            System.out.println("[IOException] " + e.toString());
+        }
+    }
+
     public Message getMessage() {
         try {
             ByteBuffer readBuffer = ByteBuffer.allocate(READ_MAX_CHARS);
-            Connection.read(readBuffer);
-            String message = readBuffer.toString();
-            return new Message(message);
+            int bytesRead = Connection.read(readBuffer);
+
+            if (bytesRead > 0) {
+                readBuffer.flip();
+                String message = new String(readBuffer.array(), 0, readBuffer.limit());
+                JSONObject json = new JSONObject(message);
+                return new Message(json);
+            } else if (bytesRead == -1) {
+                Connection.close();
+                System.out.println("[Chat Server] Client " + Client.getUsername() + " closed the connection.");
+            }
+            return null;
         } catch (IOException e) {
             System.out.println("[IOException] " + e.toString());
             return null;

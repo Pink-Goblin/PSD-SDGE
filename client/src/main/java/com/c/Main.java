@@ -1,19 +1,20 @@
 package com.c;
 
 import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("[Client] Starting...");
 
-        System.out.println("[Client] Connecting to chat server localhost:3000");
         try {
-            ChatServer cs = new ChatServer("localhost", 3000);
-        } catch (ClosedChannelException e) {
+            UI.displayMenu(true);
+        } catch (Exception e) {
+            System.out.println("! CLIENT CRASH !");
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+            try {
+                System.in.read();
+            } catch (IOException ioe) {
+            }
         }
     }
 }
